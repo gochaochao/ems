@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+	<!-- 配置国际化资源文件 -->
+	<constant name="struts.custom.i18n.resources" value="i18n"></constant>
+
+	<package name="default" namespace="/" extends="struts-default">
+
+		<interceptors>
+			<interceptor name="fileCleaner"
+				class="com.atguigu.ems.interceptors.FileCleanInterceptor"></interceptor>
+			<interceptor-stack name="emsStack">
+				<interceptor-ref name="fileCleaner" />
+				<interceptor-ref name="paramsPrepareParamsStack">
+					<param name="chain.copyFieldErrors">true</param>
+					<param name="alwaysInvokePrepare">false</param>
+
+					<!-- 配置FileUploadInterceptor的参数 -->
+					<!-- <param name="fileUpload.maximumSize"></param> -->
+					<!-- <param name="fileUpload.allowedTypes"></param> -->
+					<param name="fileUpload.allowedExtensions">xls,.xlsx</param>
+				</interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+
+		<default-interceptor-ref name="emsStack" />
+
+		<!-- <action name="emp_upload"> <result>/WEB-INF/emps/upload.jsp</result> 
+			</action> <action name="emp-upload" class="employeeAction" method="upload"> 
+			<result name="input">/WEB-INF/emps/upload.jsp</result> </action> -->
+
+		<action name="role-*" class="roleAction" method="{1}">
+			<result name="input">/WEB-INF/emps/roles/input.jsp</result>
+		</action>
+
+		<action name="emp-*" class="employeeAction" method="{1}">
+			<!-- 对异常进行映射 -->
+			<exception-mapping result="input"
+				exception="com.atguigu.ems.exception.EmployeeUnableException"></exception-mapping>
+			<exception-mapping result="input"
+				exception="com.atguigu.ems.exception.LoginNameNotFoundException"></exception-mapping>
+			<exception-mapping result="input"
+				exception="com.atguigu.ems.exception.LoginNameNotMatchPasswordException"></exception-mapping>
+			<result name="input">/index.jsp</result>
+
+			<result name="emp-save-input" type="chain">
+				<param name="actionName">emp-input</param>
+			</result>
+			<!-- <result name="emp-success">/WEB-INF/emps/input.jsp</result> -->
+			<result name="criteria-input">/WEB-INF/emps/criteria-input.jsp</result>
+			<result name="emp-upload">/WEB-INF/emps/upload.jsp</result>
+			<result name="upload-error">/WEB-INF/emps/upload.jsp</result>
+			<result name="excel-result" type="stream"></result>
+			<result name="emp-input">/WEB-INF/emps/input.jsp</result>
+			<result name="list">/WEB-INF/emps/list.jsp</result>
+			<result name="success">/WEB-INF/views/success.jsp</result>
+		</action>
+	</package>
+
+</struts>
